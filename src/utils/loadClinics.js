@@ -1,33 +1,33 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 function toNumberOrNull(value) {
-  if (value === null || value === undefined || value === '') return null;
+  if (value === null || value === undefined || value === "") return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
 
 function toCleanLower(value) {
-  return String(value ?? '').trim().toLowerCase();
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
 }
 
 function parseServiceList(value) {
-  // supports: "A, B, C" OR "A | B | C"
-  return String(value ?? '')
+  return String(value ?? "")
     .split(/[,|]/)
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean)
-    .map(s => s.toLowerCase());
+    .map((s) => s.toLowerCase());
 }
 
 function parsePopulationList(value) {
-  // supports: "A, B, C" OR "A | B | C" OR "A / B" OR "A;B"
-  const tokens = String(value ?? '')
+  const tokens = String(value ?? "")
     .split(/[,|;\/]/)
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean);
 
   // normalize to lowercase keys; unique
-  return Array.from(new Set(tokens.map(s => s.toLowerCase())));
+  return Array.from(new Set(tokens.map((s) => s.toLowerCase())));
 }
 
 export async function loadClinicData() {
@@ -40,7 +40,7 @@ export async function loadClinicData() {
     }
 
     const arrayBuffer = await response.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
 
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
@@ -53,30 +53,30 @@ export async function loadClinicData() {
 
       const services = parseServiceList(clinic.Services);
 
-      // Populations served (single spreadsheet column: "Population")
-      // We store the *full list* as an array so new populations auto-appear in the UI (like services).
       const populationServed = parsePopulationList(clinic.Population);
 
-      // Backwards-compatible single value 
       const population = (() => {
-        const hasAdult = populationServed.some(p => p.includes('adult'));
+        const hasAdult = populationServed.some((p) => p.includes("adult"));
         const hasPeds = populationServed.some(
-          p => p.includes('pediatric') || p.includes('paediatric') || p.includes('child')
+          (p) =>
+            p.includes("pediatric") ||
+            p.includes("paediatric") ||
+            p.includes("child"),
         );
 
-        if (hasAdult && hasPeds) return 'both';
-        if (hasAdult) return 'adult';
-        if (hasPeds) return 'pediatric';
-        return populationServed[0] || 'unknown';
+        if (hasAdult && hasPeds) return "both";
+        if (hasAdult) return "adult";
+        if (hasPeds) return "pediatric";
+        return populationServed[0] || "unknown";
       })();
 
-      const name = String(clinic.name ?? '').trim();
-      const postal = String(clinic.postal ?? '')
+      const name = String(clinic.name ?? "").trim();
+      const postal = String(clinic.postal ?? "")
         .trim()
         .toUpperCase()
-        .replace(/\s+/g, '');
+        .replace(/\s+/g, "");
 
-      const referralRequired = toCleanLower(clinic.ReferralRequired) === 'yes';
+      const referralRequired = toCleanLower(clinic.ReferralRequired) === "yes";
 
       const id =
         clinic.ClinicID && String(clinic.ClinicID).trim()
@@ -94,27 +94,47 @@ export async function loadClinicData() {
         population,
         referralRequired,
         name,
-        postal
+        postal,
       };
     });
 
-    // DEV sanity checks 
     if (import.meta.env.DEV) {
-      console.log('Clinics sample:', clinics.slice(0, 3));
+      console.log("Clinics sample:", clinics.slice(0, 3));
 
-      const provinces = [...new Set(clinics.map(c => c.province).filter(Boolean))].sort();
-      console.log('Unique provinces:', provinces);
+      const provinces = [
+        ...new Set(clinics.map((c) => c.province).filter(Boolean)),
+      ].sort();
+      console.log("Unique provinces:", provinces);
 
-      const badServices = clinics.filter(c => !Array.isArray(c.services));
+      const badServices = clinics.filter((c) => !Array.isArray(c.services));
       const badReferral = clinics.filter(
-        c => !(c.referralRequired === true || c.referralRequired === false || c.referralRequired === null)
+        (c) =>
+          !(
+            c.referralRequired === true ||
+            c.referralRequired === false ||
+            c.referralRequired === null
+          ),
       );
 
-      const emptyPop = clinics.filter(c => !Array.isArray(c.populationServed) || !c.populationServed.length);
+      const emptyPop = clinics.filter(
+        (c) => !Array.isArray(c.populationServed) || !c.populationServed.length,
+      );
 
-      console.log('Bad services (not array):', badServices.length, badServices.slice(0, 3));
-      console.log('Bad referralRequired (not boolean/null):', badReferral.length, badReferral.slice(0, 3));
-      console.log('Clinics missing Population values:', emptyPop.length, emptyPop.slice(0, 3));
+      console.log(
+        "Bad services (not array):",
+        badServices.length,
+        badServices.slice(0, 3),
+      );
+      console.log(
+        "Bad referralRequired (not boolean/null):",
+        badReferral.length,
+        badReferral.slice(0, 3),
+      );
+      console.log(
+        "Clinics missing Population values:",
+        emptyPop.length,
+        emptyPop.slice(0, 3),
+      );
     }
 
     return clinics;

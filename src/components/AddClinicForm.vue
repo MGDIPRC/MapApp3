@@ -16,11 +16,23 @@
       </div>
       <div>
         <label for="latitude">Latitude:</label>
-        <input type="number" step="any" v-model="latitude" id="latitude" required />
+        <input
+          type="number"
+          step="any"
+          v-model="latitude"
+          id="latitude"
+          required
+        />
       </div>
       <div>
         <label for="longitude">Longitude:</label>
-        <input type="number" step="any" v-model="longitude" id="longitude" required />
+        <input
+          type="number"
+          step="any"
+          v-model="longitude"
+          id="longitude"
+          required
+        />
       </div>
       <button type="submit">Add Clinic</button>
     </form>
@@ -28,37 +40,37 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions } from "vuex";
 
 export default {
-  name: 'AddClinicForm',
+  name: "AddClinicForm",
   data() {
     return {
-      name: '',
-      address: '',
-      province: '',
-      latitude: '',
-      longitude: ''
+      name: "",
+      address: "",
+      province: "",
+      latitude: "",
+      longitude: "",
     };
   },
   methods: {
-    ...mapActions(['addClinic']),
+    ...mapActions(["addClinic"]),
     addClinic() {
       const clinic = {
         name: this.name,
         address: this.address,
         province: this.province,
-        location: [parseFloat(this.latitude), parseFloat(this.longitude)]
+        location: [parseFloat(this.latitude), parseFloat(this.longitude)],
       };
       this.addClinic(clinic);
       // Clear form fields
-      this.name = '';
-      this.address = '';
-      this.province = '';
-      this.latitude = '';
-      this.longitude = '';
-    }
-  }
+      this.name = "";
+      this.address = "";
+      this.province = "";
+      this.latitude = "";
+      this.longitude = "";
+    },
+  },
 };
 </script>
 

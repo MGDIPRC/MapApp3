@@ -9,7 +9,11 @@
       <label for="pediatric">Pediatric</label>
     </div>
     <div>
-      <input type="checkbox" id="multidisciplinary" v-model="filters.multidisciplinary" />
+      <input
+        type="checkbox"
+        id="multidisciplinary"
+        v-model="filters.multidisciplinary"
+      />
       <label for="multidisciplinary">Multidisciplinary</label>
     </div>
   </div>
@@ -17,19 +21,19 @@
 
 <script>
 export default {
-  name: 'FilterComponent',
+  name: "FilterComponent",
   data() {
     return {
       filters: {
         adult: false,
         pediatric: false,
-        multidisciplinary: false
-      }
+        multidisciplinary: false,
+      },
     };
   },
   methods: {
     // Add methods to handle filter changes
-  }
+  },
 };
 </script>
 
@@ -39,5 +43,3 @@ export default {
   background-color: #f5f5f5;
 }
 </style>
-
-

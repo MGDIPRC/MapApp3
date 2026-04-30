@@ -11,7 +11,6 @@ export default defineConfig(({ command }) => ({
     },
   },
 
-  // Dev: serve at "/" so /clinics.xlsx works on localhost
-  // Build: use "/MapApp2/" for GitHub Pages
+
   base: command === 'serve' ? '/' : '/MapApp2/',
 }))

@@ -3,7 +3,8 @@
     <h2>Clinics in {{ selectedProvince }}</h2>
     <ul>
       <li v-for="clinic in filteredClinics" :key="clinic.id">
-        <strong>{{ clinic.name }}</strong><br />
+        <strong>{{ clinic.name }}</strong
+        ><br />
         {{ clinic.address }} <br />
       </li>
     </ul>
@@ -11,21 +12,23 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters } from "vuex";
 
 export default {
-  name: 'ClinicList',
+  name: "ClinicList",
   computed: {
-    ...mapState(['selectedProvince']),
-    ...mapGetters(['getClinics']), // Map the getter that retrieves clinics from the Vuex store
+    ...mapState(["selectedProvince"]),
+    ...mapGetters(["getClinics"]), // Map the getter that retrieves clinics from the Vuex store
 
     // Computed property to filter clinics based on the selected province
     filteredClinics() {
-      return this.getClinics.filter(clinic => 
-        clinic.province === this.selectedProvince || this.selectedProvince === 'All'
+      return this.getClinics.filter(
+        (clinic) =>
+          clinic.province === this.selectedProvince ||
+          this.selectedProvince === "All",
       );
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -45,6 +48,3 @@ ul {
   margin-left: 5px;
 }
 </style>
-
-
-

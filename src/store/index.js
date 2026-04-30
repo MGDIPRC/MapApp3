@@ -1,10 +1,10 @@
-import { createStore } from 'vuex';
-import { loadClinicData } from '@/utils/loadClinics';
+import { createStore } from "vuex";
+import { loadClinicData } from "@/utils/loadClinics";
 
 // Helper: safe string compare
 function includesText(haystack, needle) {
   if (!needle) return true;
-  return String(haystack ?? '')
+  return String(haystack ?? "")
     .toLowerCase()
     .includes(String(needle).toLowerCase());
 }
@@ -19,9 +19,7 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-    Math.cos(toRad(lat2)) *
-    Math.sin(dLng / 2) ** 2;
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -31,22 +29,32 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 // Population helpers (auto-generated options + multi-select like services)
 // -------------------------
 function normalizePopulationKey(v) {
-  return String(v ?? '').trim().toLowerCase();
+  return String(v ?? "")
+    .trim()
+    .toLowerCase();
 }
 
 function parsePopulationList(value) {
   // supports: "A, B" OR "A | B" OR "A / B" OR "A;B"
-  const tokens = Array.isArray(value) ? value : String(value ?? '').split(/[,|;\\/]/);
-  const norm = tokens.map(t => normalizePopulationKey(t)).filter(Boolean);
+  const tokens = Array.isArray(value)
+    ? value
+    : String(value ?? "").split(/[,|;\\/]/);
+  const norm = tokens.map((t) => normalizePopulationKey(t)).filter(Boolean);
   return Array.from(new Set(norm));
 }
 
 function getClinicPopulations(clinic) {
   // Prefer the normalized array produced by the loader
-  if (Array.isArray(clinic?.populationServed)) return parsePopulationList(clinic.populationServed);
+  if (Array.isArray(clinic?.populationServed))
+    return parsePopulationList(clinic.populationServed);
 
   // Fall back to raw spreadsheet field names if present
-  const raw = clinic?.Population ?? clinic?.population ?? clinic?.PopulationServed ?? clinic?.populationServed ?? '';
+  const raw =
+    clinic?.Population ??
+    clinic?.population ??
+    clinic?.PopulationServed ??
+    clinic?.populationServed ??
+    "";
   return parsePopulationList(raw);
 }
 
@@ -60,29 +68,29 @@ const store = createStore({
       // INSTANT FILTERS (apply immediately)
       // =========================
       filters: {
-        selectedProvinces: [],       // array of province values (multi select)
-        selectedServices: [],        // array
-        serviceMatchMode: 'ANY',     // "ANY" | "ALL"
-        selectedPopulations: [],     // array (dynamic, from spreadsheet)
-        referralFilter: 'any',       // "any" | "required" | "notRequired"
+        selectedProvinces: [], // array of province values (multi select)
+        selectedServices: [], // array
+        serviceMatchMode: "ANY", // "ANY" | "ALL"
+        selectedPopulations: [], // array (dynamic, from spreadsheet)
+        referralFilter: "any", // "any" | "required" | "notRequired"
       },
 
       // =========================
       // SEARCH INPUTS (button-driven)
       // =========================
       searchInputs: {
-        nameQuery: '',
-        postalQuery: '',
+        nameQuery: "",
+        postalQuery: "",
         radiusKm: 10,
       },
 
       // =========================
-      // ACTIVE SEARCH 
+      // ACTIVE SEARCH
       // =========================
       searchActive: {
-        activeSearchMode: 'none',    // "none" | "name" | "postal"
-        activeNameQuery: '',
-        activePostalCenter: null,    // { lat, lng } or null
+        activeSearchMode: "none", // "none" | "name" | "postal"
+        activeNameQuery: "",
+        activePostalCenter: null, // { lat, lng } or null
         activeRadiusKm: 10,
       },
 
@@ -101,7 +109,9 @@ const store = createStore({
     // FILTER mutations
     // =========================
     SET_SELECTED_PROVINCES(state, provinces) {
-      state.filters.selectedProvinces = Array.isArray(provinces) ? provinces : [];
+      state.filters.selectedProvinces = Array.isArray(provinces)
+        ? provinces
+        : [];
     },
 
     SET_SELECTED_SERVICES(state, services) {
@@ -110,41 +120,45 @@ const store = createStore({
 
     SET_SERVICE_MATCH_MODE(state, mode) {
       // accept "ANY" / "ALL" (case-insensitive)
-      const m = String(mode ?? '').toUpperCase();
-      state.filters.serviceMatchMode = m === 'ALL' ? 'ALL' : 'ANY';
+      const m = String(mode ?? "").toUpperCase();
+      state.filters.serviceMatchMode = m === "ALL" ? "ALL" : "ANY";
     },
 
     SET_SELECTED_POPULATIONS(state, populations) {
       const arr = Array.isArray(populations) ? populations : [];
       state.filters.selectedPopulations = Array.from(
-        new Set(arr.map(p => normalizePopulationKey(p)).filter(Boolean))
+        new Set(arr.map((p) => normalizePopulationKey(p)).filter(Boolean)),
       );
     },
 
     SET_REFERRAL_FILTER(state, value) {
-      const v = String(value ?? 'any');
+      const v = String(value ?? "any");
       // "any" | "required" | "notRequired"
       state.filters.referralFilter =
-        v === 'required' ? 'required' : v === 'notRequired' ? 'notRequired' : 'any';
+        v === "required"
+          ? "required"
+          : v === "notRequired"
+            ? "notRequired"
+            : "any";
     },
 
     RESET_FILTERS(state) {
       state.filters.selectedProvinces = [];
       state.filters.selectedServices = [];
-      state.filters.serviceMatchMode = 'ANY';
+      state.filters.serviceMatchMode = "ANY";
       state.filters.selectedPopulations = [];
-      state.filters.referralFilter = 'any';
+      state.filters.referralFilter = "any";
     },
 
     // =========================
     // SEARCH INPUT mutations (what the user typed)
     // =========================
     SET_NAME_QUERY(state, value) {
-      state.searchInputs.nameQuery = String(value ?? '');
+      state.searchInputs.nameQuery = String(value ?? "");
     },
 
     SET_POSTAL_QUERY(state, value) {
-      state.searchInputs.postalQuery = String(value ?? '');
+      state.searchInputs.postalQuery = String(value ?? "");
     },
 
     SET_RADIUS_KM(state, value) {
@@ -156,14 +170,16 @@ const store = createStore({
     // ACTIVE SEARCH mutations (what is applied)
     // =========================
     SET_ACTIVE_SEARCH_MODE(state, mode) {
-      const m = String(mode ?? 'none');
+      const m = String(mode ?? "none");
       state.searchActive.activeSearchMode =
-        m === 'name' ? 'name' : m === 'postal' ? 'postal' : 'none';
+        m === "name" ? "name" : m === "postal" ? "postal" : "none";
     },
 
     APPLY_NAME_SEARCH(state) {
-      state.searchActive.activeSearchMode = 'name';
-      state.searchActive.activeNameQuery = String(state.searchInputs.nameQuery ?? '').trim();
+      state.searchActive.activeSearchMode = "name";
+      state.searchActive.activeNameQuery = String(
+        state.searchInputs.nameQuery ?? "",
+      ).trim();
 
       // Clear postal active search
       state.searchActive.activePostalCenter = null;
@@ -172,26 +188,27 @@ const store = createStore({
 
     APPLY_POSTAL_SEARCH(state, payload) {
       // payload: { lat, lng }
-      state.searchActive.activeSearchMode = 'postal';
+      state.searchActive.activeSearchMode = "postal";
       state.searchActive.activePostalCenter =
         payload && Number.isFinite(payload.lat) && Number.isFinite(payload.lng)
           ? { lat: payload.lat, lng: payload.lng }
           : null;
 
-      state.searchActive.activeRadiusKm = Number(state.searchInputs.radiusKm) || 10;
+      state.searchActive.activeRadiusKm =
+        Number(state.searchInputs.radiusKm) || 10;
 
       // Clear name active search
-      state.searchActive.activeNameQuery = '';
+      state.searchActive.activeNameQuery = "";
     },
 
     CLEAR_SEARCH(state) {
       // Clear inputs too (you requested a clear search button later)
-      state.searchInputs.nameQuery = '';
-      state.searchInputs.postalQuery = '';
+      state.searchInputs.nameQuery = "";
+      state.searchInputs.postalQuery = "";
       state.searchInputs.radiusKm = 10;
 
-      state.searchActive.activeSearchMode = 'none';
-      state.searchActive.activeNameQuery = '';
+      state.searchActive.activeSearchMode = "none";
+      state.searchActive.activeNameQuery = "";
       state.searchActive.activePostalCenter = null;
       state.searchActive.activeRadiusKm = 10;
     },
@@ -201,10 +218,10 @@ const store = createStore({
     async fetchClinics({ commit }) {
       try {
         const clinics = await loadClinicData();
-        console.log('Loaded clinics:', clinics.length, clinics[0]);
-        commit('SET_CLINICS_ALL', clinics);
+        console.log("Loaded clinics:", clinics.length, clinics[0]);
+        commit("SET_CLINICS_ALL", clinics);
       } catch (error) {
-        console.error('Failed to fetch clinics from spreadsheet:', error);
+        console.error("Failed to fetch clinics from spreadsheet:", error);
       }
     },
   },
@@ -230,18 +247,20 @@ const store = createStore({
 
         // Services
         if (f.selectedServices.length) {
-          const clinicServices = Array.isArray(clinic.services) ? clinic.services : [];
+          const clinicServices = Array.isArray(clinic.services)
+            ? clinic.services
+            : [];
 
-          if (f.serviceMatchMode === 'ALL') {
+          if (f.serviceMatchMode === "ALL") {
             // must include every selected service
             const ok = f.selectedServices.every((s) =>
-              clinicServices.includes(String(s).toLowerCase())
+              clinicServices.includes(String(s).toLowerCase()),
             );
             if (!ok) return false;
           } else {
             // ANY: include at least one
             const ok = f.selectedServices.some((s) =>
-              clinicServices.includes(String(s).toLowerCase())
+              clinicServices.includes(String(s).toLowerCase()),
             );
             if (!ok) return false;
           }
@@ -251,16 +270,16 @@ const store = createStore({
         if (f.selectedPopulations.length) {
           const clinicPops = getClinicPopulations(clinic);
           const ok = f.selectedPopulations.some((p) =>
-            clinicPops.includes(normalizePopulationKey(p))
+            clinicPops.includes(normalizePopulationKey(p)),
           );
           if (!ok) return false;
         }
 
         // Referral filter
-        if (f.referralFilter === 'required') {
+        if (f.referralFilter === "required") {
           if (clinic.referralRequired !== true) return false;
         }
-        if (f.referralFilter === 'notRequired') {
+        if (f.referralFilter === "notRequired") {
           if (clinic.referralRequired !== false) return false;
         }
 
@@ -276,18 +295,18 @@ const store = createStore({
       const s = state.searchActive;
 
       // no active search
-      if (s.activeSearchMode === 'none') return base;
+      if (s.activeSearchMode === "none") return base;
 
       // name search applied
-      if (s.activeSearchMode === 'name') {
-        const q = String(s.activeNameQuery ?? '').trim();
+      if (s.activeSearchMode === "name") {
+        const q = String(s.activeNameQuery ?? "").trim();
         if (!q) return base;
 
         return base.filter((clinic) => includesText(clinic.name, q));
       }
 
       // postal radius applied
-      if (s.activeSearchMode === 'postal') {
+      if (s.activeSearchMode === "postal") {
         if (!s.activePostalCenter) return base;
 
         const center = s.activePostalCenter;

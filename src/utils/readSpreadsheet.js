@@ -1,18 +1,20 @@
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 export function readClinicsFromSpreadsheet(filePath) {
   return new Promise((resolve, reject) => {
     // Fetch the file from the specified path
     fetch(filePath)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to fetch file: ${response.statusText}`);
         }
         return response.arrayBuffer();
       })
-      .then(arrayBuffer => {
+      .then((arrayBuffer) => {
         // Read the array buffer using XLSX
-        const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
+        const workbook = XLSX.read(new Uint8Array(arrayBuffer), {
+          type: "array",
+        });
 
         // Get the first sheet's name and content
         const firstSheetName = workbook.SheetNames[0];
@@ -23,7 +25,7 @@ export function readClinicsFromSpreadsheet(filePath) {
 
         resolve(jsonData); // Return the JSON data
       })
-      .catch(error => {
+      .catch((error) => {
         reject(`Error reading spreadsheet: ${error.message}`);
       });
   });
