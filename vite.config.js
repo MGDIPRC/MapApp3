@@ -12,5 +12,5 @@ export default defineConfig(({ command }) => ({
   },
 
 
-  base: command === 'serve' ? '/' : '/MapApp2/',
+  base: command === 'serve' ? '/' : '/MapApp3/',
 }))
